@@ -1,5 +1,13 @@
 import numpy as np
+import Agent as agent
+import random
 import math
+
+# import choice from agent
+
+#TODO: Figure out termination of game after terminal state is reached
+# (calls to game.is_winner()/draw_board() should return but aren't returning)
+
 
 class Connect4Game:
     def __init__(self, rows=6, cols=7):
@@ -7,7 +15,7 @@ class Connect4Game:
         self.cols = cols
         self.board = np.zeros((rows, cols), dtype=int)
         self.current_player = 1
-        self.mode = 'human'
+        self.mode = 'computer'
 
     def is_valid_move(self, col):
         return self.board[0][col] == 0
@@ -118,6 +126,24 @@ class Connect4GUI:
     def close(self):
         self.root.destroy()
 
+def selectMove(game):
+    max_reward = -1000
+    move = -1
+    for col in range(game.cols):
+        if game.is_valid_move(col):
+            tempgame = Connect4Game()
+            copy = game.board.copy()
+            tempgame.board = [row[:] for row in copy]
+            tempgame.current_player = game.current_player
+            tempgame.make_move(col)
+            reward = agent.reward(tempgame.board)
+            if reward > max_reward:
+                max_reward = reward
+                move = col
+    if move == -1:
+        print("No valid move")
+    print("Move:", move)
+    return move
 
 # Create game and empty board
 gui = Connect4GUI()
@@ -126,30 +152,20 @@ gui.draw_board()
 game.print_board()
 
 
-def selectMove(game):
-
-    # This is where our logic will go
-    for col in range(game.cols):
-        if game.is_valid_move(col):
-            return col
-
-
 while not game.is_board_full():
     if game.current_player == 1 and game.mode == 'human':
         col = int(input("Enter your move (column number): "))
         while not game.is_valid_move(col):
             col = int(input("Invalid move. Enter your move (column number): "))
     elif game.current_player == 1 and game.mode == 'computer':
-
         # Move logic for player 1 in Computer vs. Computer games
+        input()
         col = selectMove(game)
     else:
-
         # Move logic for player 2 in all games
         col = selectMove(game)
 
     game.make_move(col)
-
     game.print_board()
     gui.draw_board()
 
