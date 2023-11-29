@@ -7,7 +7,7 @@ class ConnectFourNode:
         self.player_turn = pt  # Assume player 2 goes first, since player one starts in framework
 
     def is_terminal(self):
-        return self.is_winner(1) or self.is_winner(2) or self.is_board_full()
+        return self.is_winner(1, self.board) or self.is_winner(2, self.board) or self.is_board_full()
 
     def generate_children(self):
         children = []
@@ -20,6 +20,12 @@ class ConnectFourNode:
         return children
 
     def heuristic(self, board, player, multiplier=3):
+        
+        if self.is_winner(player, board): 
+            return 100000
+        if self.is_winner(3 - player, board): 
+            return -100000
+
         h = 0
 
         for row in range(6):
@@ -67,24 +73,24 @@ class ConnectFourNode:
         #     # Evaluate based on the number of pieces in a row
         return self.evaluate_board()
 
-    def is_winner(self, player):
+    def is_winner(self, player, b):
         # Check for a win in rows, columns, and diagonals
         for row in range(6):
             for col in range(4):
-                if all(self.board[row][col + i] == player for i in range(4)):
+                if all(b[row][col + i] == player for i in range(4)):
                     return True  # Horizontal win
 
         for row in range(3):
             for col in range(7):
-                if all(self.board[row + i][col] == player for i in range(4)):
+                if all(b[row + i][col] == player for i in range(4)):
                     return True  # Vertical win
 
         for row in range(3):
             for col in range(4):
-                if all(self.board[row + i][col + i] == player for i in range(4)):
+                if all(b[row + i][col + i] == player for i in range(4)):
                     return True  # Diagonal win (top-left to bottom-right)
 
-                if all(self.board[row + i][col + 3 - i] == player for i in range(4)):
+                if all(b[row + i][col + 3 - i] == player for i in range(4)):
                     return True  # Diagonal win (top-right to bottom-left)
 
         return False
@@ -106,7 +112,6 @@ class ConnectFourNode:
         #player1_score = self.evaluate_player(1)
         #player2_score = self.evaluate_player(2)
         return self.evaluate_player(1) #player1_score - player2_score
-
 
     ## THIS IS THE REWARD FUNCTION
     ## IF YOU WANT TO TEST A HEURISTIC, CHANGE THIS FUNCTION TO RETURN YOUR REWARD VAlUE
@@ -147,7 +152,7 @@ class ConnectFourNode:
 
 def minimax_alpha_beta(node, depth, alpha, beta, maximizing_player):
     if depth == 0 or node.is_terminal():
-        return node.evaluate()
+        return node.evaluate() / pow(0.9, depth)
 
     if maximizing_player:
         max_eval = -math.inf
@@ -169,8 +174,8 @@ def minimax_alpha_beta(node, depth, alpha, beta, maximizing_player):
         return min_eval
 
 def reward(game, curr_player):
-    depth = 3
+    depth = 2
     root = ConnectFourNode(game, curr_player)
-    result = minimax_alpha_beta(root, depth, -math.inf, math.inf, curr_player == 2)
+    result = minimax_alpha_beta(root, 2 * depth, -math.inf, math.inf, curr_player == 2)
     print(result)
     return result
