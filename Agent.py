@@ -19,12 +19,12 @@ class ConnectFourNode:
                 children.append(ConnectFourNode(child_board, pt=(3 - self.player_turn))) # Make child and switch turn
         return children
 
-    def heuristic(self, board, player, multiplier=3):
+    def heuristic(self, board, player, multiplier=7):
         
         if self.is_winner(player, board): 
-            return 100000
+            return 1000000
         if self.is_winner(3 - player, board): 
-            return -100000
+            return -1000000
 
         h = 0
 
@@ -152,7 +152,7 @@ class ConnectFourNode:
 
 def minimax_alpha_beta(node, depth, alpha, beta, maximizing_player):
     if depth == 0 or node.is_terminal():
-        return node.evaluate() / pow(0.9, depth)
+        return node.evaluate()
 
     if maximizing_player:
         max_eval = -math.inf
