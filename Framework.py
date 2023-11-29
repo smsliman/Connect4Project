@@ -1,4 +1,7 @@
 import numpy as np
+import Agent as agent
+
+# import choice from agent
 
 class Connect4Game:
     def __init__(self, rows=6, cols=7):
@@ -13,6 +16,7 @@ class Connect4Game:
 
     def make_move(self, col):
         for row in range(self.rows-1, -1, -1):
+            print(self.board[row][col])
             if self.board[row][col] == 0:
                 self.board[row][col] = self.current_player
                 break
@@ -125,11 +129,22 @@ game.print_board()
 
 
 def selectMove(game):
-
-    # This is where our logic will go
+    max_reward = -1000
+    move = -1
     for col in range(game.cols):
         if game.is_valid_move(col):
-            return col
+            tempgame = Connect4Game()
+            tempgame.board = [row[:] for row in game.board]
+            tempgame.current_player = game.current_player
+            tempgame.make_move(col)
+            reward = agent.reward(tempgame.board)
+            if reward > max_reward:
+                max_reward = reward
+                move = col
+    if move == -1:
+        print("No valid move")
+    return move
+    
 
 
 while not game.is_board_full():
@@ -142,7 +157,6 @@ while not game.is_board_full():
         # Move logic for player 1 in Computer vs. Computer games
         col = selectMove(game)
     else:
-
         # Move logic for player 2 in all games
         col = selectMove(game)
 
