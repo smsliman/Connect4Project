@@ -1,5 +1,8 @@
 import numpy as np
 
+#TODO: Figure out termination of game after terminal state is reached
+# (calls to game.is_winner()/draw_board() should return but aren't returning)
+
 class Connect4Game:
     def __init__(self, rows=6, cols=7):
         self.rows = rows
