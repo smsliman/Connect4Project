@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 class Connect4Game:
     def __init__(self, rows=6, cols=7):
@@ -68,6 +69,7 @@ class Connect4Game:
                 print(self.board[row][col], end=' ')
             print()
         print()
+
 
 
 # Adding a GUI
@@ -159,6 +161,121 @@ while not game.is_board_full():
 
 if game.is_board_full() and not game.is_winner(1) and not game.is_winner(2):
     print("It's a draw!")
+
+def heuristic(game, multiplier=2, player=1):
+    h, h_temp = 0, 0
+    for r in range(len(game.board)):
+        for c in range(len(game.board)):
+            h_temp = h_pos(game, r, c, multiplier)
+            if game.board[r][c] != player:
+                h_temp *= -1
+            h += h_temp
+    return h
+
+def h_pos(game, r_o, c_o, multiplier):
+
+    if game.board[r_o][c_o] == 0: return 0
+
+    # Tracking variables
+    h = 0
+    r, c = r_o, c_o
+
+    # Check row
+    h_temp = 1
+    r = r_o - 1
+    while (game.board[r][c_o] == game.board[r_o][c_o] or game.board[r][c_o] == 0) and r >= max(0, r_o - 3):
+        r -= 1
+        if game.board[r][c_o] == game.board[r_o][c_o]:
+            h_temp *= multiplier
+            if h_temp >= 8:
+                return math.inf
+    h += h_temp
+    h_temp = 1
+    r = r_o + 1
+    while (game.board[r][c_o] == game.board[r_o][c_o] or game.board[r][c_o] == 0) and r <= min(5, r_o + 3):
+        r += 1
+        if game.board[r][c_o] == game.board[r_o][c_o]:
+            h_temp *= multiplier
+            if h_temp >= 8:
+                return math.inf
+    h += h_temp
+
+    # Check column
+    h_temp = 1
+    r = r_o
+    c = c_o - 1
+    while (game.board[r_o][c] == game.board[r_o][c_o] or game.board[r_o][c] == 0) and c >= max(0, c_o - 3):
+        c -= 1
+        if game.board[r_o][c] == game.board[r_o][c_o]:
+            h_temp *= multiplier
+            if h_temp >= 8:
+                return math.inf
+    h += h_temp
+    h_temp = 1
+    c = c_o + 1
+    while (game.board[r_o][c] == game.board[r_o][c_o] or game.board[r_o][c] == 0) and c <= min(6, c_o + 3):
+        c += 1
+        if game.board[r_o][c] == game.board[r_o][c_o]:
+            h_temp *= multiplier
+            if h_temp >= 8:
+                return math.inf
+    h += h_temp
+
+    # Check diagonal
+    h_temp = 1
+    r = r_o + 1
+    c = c_o - 1
+    while (game.board[r][c] == game.board[r_o][c_o] or game.board[r][c] == 0) and c >= max(0, c_o - 3) and r <= min(5, r_o + 3):
+        r += 1
+        c -= 1
+        if game.board[r][c] == game.board[r_o][c_o]:
+            h_temp *= multiplier
+            if h_temp >= 8:
+                return math.inf
+    h += h_temp
+    h_temp = 1
+    r = r_o - 1
+    c = c_o + 1
+    while (game.board[r][c] == game.board[r_o][c_o] or game.board[r][c] == 0) and c <= min(6, c_o + 3) and r >= max(0, r_o - 3) :
+        r -= 1
+        c += 1
+        if game.board[r][c] == game.board[r_o][c_o]:
+            h_temp *= multiplier
+            if h_temp >= 8:
+                return math.inf
+    h += h_temp
+
+    # Check other diagonal
+    h_temp = 1
+    r = r_o - 1
+    c = c_o - 1
+    while (game.board[r][c] == game.board[r_o][c_o] or game.board[r][c] == 0) and c >= max(0, c_o - 3) and r >= max(0, r_o - 3):
+        r += 1
+        c -= 1
+        if game.board[r][c] == game.board[r_o][c_o]:
+            h_temp *= multiplier
+            if h_temp >= 8:
+                return math.inf
+    h += h_temp
+    h_temp = 1
+    r = r_o + 1
+    c = c_o + 1
+    while (game.board[r][c] == game.board[r_o][c_o] or game.board[r][c] == 0) and c <= min(6, c_o + 3) and r <= min(5, r_o + 3):
+        r -= 1
+        c += 1
+        if game.board[r][c] == game.board[r_o][c_o]:
+            h_temp *= multiplier
+            if h_temp >= 8:
+                return math.inf
+    h += h_temp
+
+    return h
+
+
+
+    
+
+
 
 
 
