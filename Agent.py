@@ -18,6 +18,115 @@ class ConnectFourNode:
                 child_node.player_turn = 3 - self.player_turn  # Switch player turn
                 children.append(child_node)
         return children
+    
+    def h_pos(self, board, r_o, c_o, multiplier):
+
+        if board[r_o][c_o] == 0: return 0
+
+        # Tracking variables
+        h = 0
+        r, c = r_o, c_o
+
+        # Check row
+        h_temp = 1
+        r = r_o - 1
+        while r >= max(0, r_o - 3) and (board[r][c_o] == board[r_o][c_o] or board[r][c_o] == 0):
+            if board[r][c_o] == board[r_o][c_o]:
+                h_temp *= multiplier
+                if h_temp >= 8:
+                    return math.inf
+            r -= 1
+        h += h_temp
+        h_temp = 1
+        r = r_o + 1
+        while r <= min(5, r_o + 3) and (board[r][c_o] == board[r_o][c_o] or board[r][c_o] == 0):
+            if board[r][c_o] == board[r_o][c_o]:
+                h_temp *= multiplier
+                if h_temp >= 8:
+                    return math.inf
+            r += 1
+        h += h_temp
+
+        # Check column
+        h_temp = 1
+        r = r_o
+        c = c_o - 1
+        while c >= max(0, c_o - 3) and (board[r_o][c] == board[r_o][c_o] or board[r_o][c] == 0):
+            if board[r_o][c] == board[r_o][c_o]:
+                h_temp *= multiplier
+                if h_temp >= 8:
+                    return math.inf
+            c -= 1
+        h += h_temp
+        h_temp = 1
+        c = c_o + 1
+        while c <= min(6, c_o + 3) and (board[r_o][c] == board[r_o][c_o] or board[r_o][c] == 0):
+            if board[r_o][c] == board[r_o][c_o]:
+                h_temp *= multiplier
+                if h_temp >= 8:
+                    return math.inf
+            c += 1
+        h += h_temp
+
+        # Check diagonal
+        h_temp = 1
+        r = r_o + 1
+        c = c_o - 1
+        while c >= max(0, c_o - 3) and r <= min(5, r_o + 3) and (board[r][c] == board[r_o][c_o] or board[r][c] == 0):
+            if board[r][c] == board[r_o][c_o]:
+                h_temp *= multiplier
+                if h_temp >= 8:
+                    return math.inf            
+            r += 1
+            c -= 1
+        h += h_temp
+        h_temp = 1
+        r = r_o - 1
+        c = c_o + 1
+        while c <= min(6, c_o + 3) and r >= max(0, r_o - 3) and (board[r][c] == board[r_o][c_o] or board[r][c] == 0):
+            if board[r][c] == board[r_o][c_o]:
+                h_temp *= multiplier
+                if h_temp >= 8:
+                    return math.inf
+            r -= 1
+            c += 1
+        h += h_temp
+
+        # Check other diagonal
+        h_temp = 1
+        r = r_o - 1
+        c = c_o - 1
+        while c >= max(0, c_o - 3) and r >= max(0, r_o - 3) and (board[r][c] == board[r_o][c_o] or board[r][c] == 0):
+            if board[r][c] == board[r_o][c_o]:
+                h_temp *= multiplier
+                if h_temp >= 8:
+                    return math.inf
+            r -= 1
+            c -= 1
+        h += h_temp
+        h_temp = 1
+        r = r_o + 1
+        c = c_o + 1
+        while c <= min(6, c_o + 3) and r <= min(5, r_o + 3) and (board[r][c] == board[r_o][c_o] or board[r][c] == 0):
+            if board[r][c] == board[r_o][c_o]:
+                h_temp *= multiplier
+                if h_temp >= 8:
+                    return math.inf
+            r += 1
+            c += 1
+        h += h_temp
+
+        return h
+
+    def heuristic(self, board, multiplier=2, player=1):
+        h, h_temp = 0, 0
+        for r in range(len(board)):
+            for c in range(len(board)):
+                h_temp = self.h_pos(board, r, c, multiplier)
+                if board[r][c] != player:
+                    h_temp *= -1
+                h += h_temp
+        return h
 
     def evaluate(self):
         # if self.is_winner(1):
@@ -72,7 +181,8 @@ class ConnectFourNode:
     ## THIS IS THE REWARD FUNCTION
     ## IF YOU WANT TO TEST A HEURISTIC, CHANGE THIS FUNCTION TO RETURN YOUR REWARD VAlUE
     def evaluate_player(self, player):
-        score = 0
+        return self.heuristic(self.board)
+        """ score = 0
         for row in range(6):
             for col in range(7):
                 if self.board[row][col] == 0:
@@ -80,7 +190,7 @@ class ConnectFourNode:
                     score += self.score_position(row, col, 0, 1, player)  # Vertical
                     score += self.score_position(row, col, 1, 1, player)  # Diagonal /
                     score += self.score_position(row, col, 1, -1, player)  # Diagonal \
-        return score
+        return score """
 
     def score_position(self, row, col, row_change, col_change, player):
         score = 0
