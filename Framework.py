@@ -1,5 +1,6 @@
 import numpy as np
 import Agent as agent
+import random
 
 # import choice from agent
 
@@ -19,7 +20,6 @@ class Connect4Game:
 
     def make_move(self, col):
         for row in range(self.rows-1, -1, -1):
-            print(self.board[row][col])
             if self.board[row][col] == 0:
                 self.board[row][col] = self.current_player
                 break
@@ -123,21 +123,14 @@ class Connect4GUI:
     def close(self):
         self.root.destroy()
 
-
-# Create game and empty board
-gui = Connect4GUI()
-game = gui.game
-gui.draw_board()
-game.print_board()
-
-
 def selectMove(game):
     max_reward = -1000
     move = -1
     for col in range(game.cols):
         if game.is_valid_move(col):
             tempgame = Connect4Game()
-            tempgame.board = [row[:] for row in game.board]
+            copy = game.board.copy()
+            tempgame.board = [row[:] for row in copy]
             tempgame.current_player = game.current_player
             tempgame.make_move(col)
             reward = agent.reward(tempgame.board)
@@ -146,8 +139,14 @@ def selectMove(game):
                 move = col
     if move == -1:
         print("No valid move")
+    print("Move:", move)
     return move
-    
+
+# Create game and empty board
+gui = Connect4GUI()
+game = gui.game
+gui.draw_board()
+game.print_board()
 
 
 while not game.is_board_full():
@@ -156,7 +155,6 @@ while not game.is_board_full():
         while not game.is_valid_move(col):
             col = int(input("Invalid move. Enter your move (column number): "))
     elif game.current_player == 1 and game.mode == 'computer':
-
         # Move logic for player 1 in Computer vs. Computer games
         col = selectMove(game)
     else:
@@ -164,7 +162,6 @@ while not game.is_board_full():
         col = selectMove(game)
 
     game.make_move(col)
-
     game.print_board()
     gui.draw_board()
 
