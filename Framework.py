@@ -145,6 +145,8 @@ def selectMove(game):
             elif game.current_player == 2 and reward < max_reward:
                 max_reward = reward
                 move = col
+            elif reward == max_reward and abs(col - 3) < abs(move - 3):
+                move = col
     if move == -1:
         print("No valid move")
     print("Move:", move)

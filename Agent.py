@@ -19,43 +19,43 @@ class ConnectFourNode:
                 children.append(ConnectFourNode(child_board, pt=(3 - self.player_turn))) # Make child and switch turn
         return children
 
-    def heuristic(self, board, player):
+    def heuristic(self, board, player, multiplier=3):
         h = 0
 
         for row in range(6):
             for col in range(4):
-                h_for, h_against = 0, 0
+                h_for, h_against = 1, 1
                 for i in range(4):
-                    h_for += 1 if board[row][col + i] == player else 0
-                    h_against += 1 if board[row][col + i] == (3 - player) else 0
+                    h_for *= multiplier if board[row][col + i] == player else 1
+                    h_against *= multiplier if board[row][col + i] == (3 - player) else 1
                 h += h_for if all(board[row][col + i] != (3 - player) for i in range(4)) else 0
                 h -= h_against if all(board[row][col + i] != player for i in range(4)) else 0
 
         for row in range(3):
             for col in range(7):
-                h_for, h_against = 0, 0
+                h_for, h_against = 1, 1
                 for i in range(4):
-                    h_for += 1 if board[row + i][col] == player else 0
-                    h_against += 1 if board[row + i][col] == (3 - player) else 0
+                    h_for *= multiplier if board[row + i][col] == player else 1
+                    h_against *= multiplier if board[row + i][col] == (3 - player) else 1
                 h += h_for if all(board[row + i][col] != (3 - player) for i in range(4)) else 0
                 h -= h_against if all(board[row + i][col] != player for i in range(4)) else 0
 
         for row in range(3):
             for col in range(4):
-                h_for, h_against = 0, 0
+                h_for, h_against = 1, 1
                 for i in range(4):
-                    h_for += 1 if board[row + i][col + i] == player else 0
-                    h_against += 1 if board[row + i][col + i] == (3 - player) else 0
+                    h_for *= multiplier if board[row + i][col + i] == player else 1
+                    h_against *= multiplier if board[row + i][col + i] == (3 - player) else 1
                 h += h_for if all(board[row + i][col + i] != (3 - player) for i in range(4)) else 0
                 h -= h_against if all(board[row + i][col + i] != player for i in range(4)) else 0
 
-                h_for, h_against = 0, 0
+                h_for, h_against = 1, 1
                 for i in range(4):
-                    h_for += 1 if board[row + i][col + 3 - i] == player else 0
-                    h_against += 1 if board[row + i][col + 3 - i] == (3 - player) else 0
+                    h_for *= multiplier if board[row + i][col + 3 - i] == player else 1
+                    h_against *= multiplier if board[row + i][col + 3 - i] == (3 - player) else 1
                 h += h_for if all(board[row + i][col + 3 - i] != (3 - player) for i in range(4)) else 0
                 h -= h_against if all(board[row + i][col + 3 - i] != player for i in range(4)) else 0
-
+        
         return h
 
     def evaluate(self):
@@ -103,9 +103,9 @@ class ConnectFourNode:
 
     def evaluate_board(self):
         # Evaluate based on the number of potential unblocked rows, columns, or diagonals for both players
-        player1_score = self.evaluate_player(1)
-        player2_score = self.evaluate_player(2)
-        return player1_score - player2_score
+        #player1_score = self.evaluate_player(1)
+        #player2_score = self.evaluate_player(2)
+        return self.evaluate_player(1) #player1_score - player2_score
 
 
     ## THIS IS THE REWARD FUNCTION
@@ -168,8 +168,9 @@ def minimax_alpha_beta(node, depth, alpha, beta, maximizing_player):
                 break  # Alpha cutoff
         return min_eval
 
-def reward(game, next_player):
-    root = ConnectFourNode(game, next_player)
-    result = minimax_alpha_beta(root, 3, -math.inf, math.inf, next_player == 2)
+def reward(game, curr_player):
+    depth = 3
+    root = ConnectFourNode(game, curr_player)
+    result = minimax_alpha_beta(root, depth, -math.inf, math.inf, curr_player == 2)
     print(result)
     return result
