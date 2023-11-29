@@ -1,9 +1,10 @@
 import math
+import copy
 
 class ConnectFourNode:
-    def __init__(self, board):
+    def __init__(self, board, pt = 2):
         self.board = board
-        self.player_turn = 1  # Assume player 1 goes first
+        self.player_turn = pt  # Assume player 2 goes first, since player one starts in framework
 
     def is_terminal(self):
         return self.is_winner(1) or self.is_winner(2) or self.is_board_full()
@@ -12,120 +13,50 @@ class ConnectFourNode:
         children = []
         for col in range(7):
             if self.is_valid_move(col):
-                child_board = [row[:] for row in self.board]
+                #child_board = [row[:] for row in self.board]
+                child_board = copy.deepcopy(self.board)
                 self.make_move(child_board, col)
-                child_node = ConnectFourNode(child_board)
-                child_node.player_turn = 3 - self.player_turn  # Switch player turn
-                children.append(child_node)
+                children.append(ConnectFourNode(child_board, pt=(3 - self.player_turn))) # Make child and switch turn
         return children
-    
-    def h_pos(self, board, r_o, c_o, multiplier):
 
-        if board[r_o][c_o] == 0: return 0
-
-        # Tracking variables
+    def heuristic(self, board, player=1):
         h = 0
-        r, c = r_o, c_o
 
-        # Check row
-        h_temp = 1
-        r = r_o - 1
-        while r >= max(0, r_o - 3) and (board[r][c_o] == board[r_o][c_o] or board[r][c_o] == 0):
-            if board[r][c_o] == board[r_o][c_o]:
-                h_temp *= multiplier
-                if h_temp >= 8:
-                    return math.inf
-            r -= 1
-        h += h_temp
-        h_temp = 1
-        r = r_o + 1
-        while r <= min(5, r_o + 3) and (board[r][c_o] == board[r_o][c_o] or board[r][c_o] == 0):
-            if board[r][c_o] == board[r_o][c_o]:
-                h_temp *= multiplier
-                if h_temp >= 8:
-                    return math.inf
-            r += 1
-        h += h_temp
+        for row in range(6):
+            for col in range(4):
+                h_for, h_against = 0, 0
+                for i in range(4):
+                    h_for += 1 if board[row][col + i] == player else 0
+                    h_against += 1 if board[row][col + i] == (3 - player) else 0
+                h += h_for if all(board[row][col + i] != (3 - player) for i in range(4)) else 0
+                h -= h_against if all(board[row][col + i] != player for i in range(4)) else 0
+                print(h)
 
-        # Check column
-        h_temp = 1
-        r = r_o
-        c = c_o - 1
-        while c >= max(0, c_o - 3) and (board[r_o][c] == board[r_o][c_o] or board[r_o][c] == 0):
-            if board[r_o][c] == board[r_o][c_o]:
-                h_temp *= multiplier
-                if h_temp >= 8:
-                    return math.inf
-            c -= 1
-        h += h_temp
-        h_temp = 1
-        c = c_o + 1
-        while c <= min(6, c_o + 3) and (board[r_o][c] == board[r_o][c_o] or board[r_o][c] == 0):
-            if board[r_o][c] == board[r_o][c_o]:
-                h_temp *= multiplier
-                if h_temp >= 8:
-                    return math.inf
-            c += 1
-        h += h_temp
+        for row in range(3):
+            for col in range(7):
+                h_for, h_against = 0, 0
+                for i in range(4):
+                    h_for += 1 if board[row + i][col] == player else 0
+                    h_against += 1 if board[row + i][col] == (3 - player) else 0
+                h += h_for if all(board[row + i][col] != (3 - player) for i in range(4)) else 0
+                h -= h_against if all(board[row + i][col] != player for i in range(4)) else 0
 
-        # Check diagonal
-        h_temp = 1
-        r = r_o + 1
-        c = c_o - 1
-        while c >= max(0, c_o - 3) and r <= min(5, r_o + 3) and (board[r][c] == board[r_o][c_o] or board[r][c] == 0):
-            if board[r][c] == board[r_o][c_o]:
-                h_temp *= multiplier
-                if h_temp >= 8:
-                    return math.inf            
-            r += 1
-            c -= 1
-        h += h_temp
-        h_temp = 1
-        r = r_o - 1
-        c = c_o + 1
-        while c <= min(6, c_o + 3) and r >= max(0, r_o - 3) and (board[r][c] == board[r_o][c_o] or board[r][c] == 0):
-            if board[r][c] == board[r_o][c_o]:
-                h_temp *= multiplier
-                if h_temp >= 8:
-                    return math.inf
-            r -= 1
-            c += 1
-        h += h_temp
+        for row in range(3):
+            for col in range(4):
+                h_for, h_against = 0, 0
+                for i in range(4):
+                    h_for += 1 if board[row + i][col + i] == player else 0
+                    h_against += 1 if board[row + i][col + i] == (3 - player) else 0
+                h += h_for if all(board[row + i][col + i] != (3 - player) for i in range(4)) else 0
+                h -= h_against if all(board[row + i][col + i] != player for i in range(4)) else 0
 
-        # Check other diagonal
-        h_temp = 1
-        r = r_o - 1
-        c = c_o - 1
-        while c >= max(0, c_o - 3) and r >= max(0, r_o - 3) and (board[r][c] == board[r_o][c_o] or board[r][c] == 0):
-            if board[r][c] == board[r_o][c_o]:
-                h_temp *= multiplier
-                if h_temp >= 8:
-                    return math.inf
-            r -= 1
-            c -= 1
-        h += h_temp
-        h_temp = 1
-        r = r_o + 1
-        c = c_o + 1
-        while c <= min(6, c_o + 3) and r <= min(5, r_o + 3) and (board[r][c] == board[r_o][c_o] or board[r][c] == 0):
-            if board[r][c] == board[r_o][c_o]:
-                h_temp *= multiplier
-                if h_temp >= 8:
-                    return math.inf
-            r += 1
-            c += 1
-        h += h_temp
+                h_for, h_against = 0, 0
+                for i in range(4):
+                    h_for += 1 if board[row + i][col + 3 - i] == player else 0
+                    h_against += 1 if board[row + i][col + 3 - i] == (3 - player) else 0
+                h += h_for if all(board[row + i][col + 3 - i] != (3 - player) for i in range(4)) else 0
+                h -= h_against if all(board[row + i][col + 3 - i] != player for i in range(4)) else 0
 
-        return h
-
-    def heuristic(self, board, multiplier=2, player=1):
-        h, h_temp = 0, 0
-        for r in range(len(board)):
-            for c in range(len(board)):
-                h_temp = self.h_pos(board, r, c, multiplier)
-                if board[r][c] != player:
-                    h_temp *= -1
-                h += h_temp
         return h
 
     def evaluate(self):
@@ -165,10 +96,10 @@ class ConnectFourNode:
     def is_valid_move(self, col):
         return self.board[0][col] == 0
 
-    def make_move(self, board, col):
+    def make_move(self, b, col):
         for row in range(5, -1, -1):
-            if board[row][col] == 0:
-                board[row][col] = self.player_turn
+            if b[row][col] == 0:
+                b[row][col] = self.player_turn
                 break
 
     def evaluate_board(self):
@@ -181,7 +112,7 @@ class ConnectFourNode:
     ## THIS IS THE REWARD FUNCTION
     ## IF YOU WANT TO TEST A HEURISTIC, CHANGE THIS FUNCTION TO RETURN YOUR REWARD VAlUE
     def evaluate_player(self, player):
-        return self.heuristic(self.board)
+        return self.heuristic(self.board, player=player)
         """ score = 0
         for row in range(6):
             for col in range(7):

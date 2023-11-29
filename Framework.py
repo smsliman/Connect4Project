@@ -21,6 +21,7 @@ class Connect4Game:
         return self.board[0][col] == 0
 
     def make_move(self, col):
+        if col < 0: return #sanity check
         for row in range(self.rows-1, -1, -1):
             if self.board[row][col] == 0:
                 self.board[row][col] = self.current_player
