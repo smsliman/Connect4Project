@@ -13,7 +13,7 @@ class Connect4Game:
         self.cols = cols
         self.board = np.zeros((rows, cols), dtype=int)
         self.current_player = 1
-        self.mode = 'human'
+        self.mode = 'computer'
 
     def is_valid_move(self, col):
         return self.board[0][col] == 0
@@ -156,6 +156,7 @@ while not game.is_board_full():
             col = int(input("Invalid move. Enter your move (column number): "))
     elif game.current_player == 1 and game.mode == 'computer':
         # Move logic for player 1 in Computer vs. Computer games
+        input()
         col = selectMove(game)
     else:
         # Move logic for player 2 in all games

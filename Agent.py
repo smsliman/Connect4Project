@@ -20,13 +20,13 @@ class ConnectFourNode:
         return children
 
     def evaluate(self):
-        if self.is_winner(1):
-            return 100  # Player 1 wins
-        elif self.is_winner(2):
-            return -100  # Player 2 wins
-        else:
-            # Evaluate based on the number of pieces in a row
-            return self.evaluate_board()
+        # if self.is_winner(1):
+        #     return 100  # Player 1 wins
+        # elif self.is_winner(2):
+        #     return -100  # Player 2 wins
+        # else:
+        #     # Evaluate based on the number of pieces in a row
+        return self.evaluate_board()
 
     def is_winner(self, player):
         # Check for a win in rows, columns, and diagonals
@@ -68,6 +68,9 @@ class ConnectFourNode:
         player2_score = self.evaluate_player(2)
         return player1_score - player2_score
 
+
+    ## THIS IS THE REWARD FUNCTION
+    ## IF YOU WANT TO TEST A HEURISTIC, CHANGE THIS FUNCTION TO RETURN YOUR REWARD VAlUE
     def evaluate_player(self, player):
         score = 0
         for row in range(6):
@@ -128,4 +131,5 @@ def minimax_alpha_beta(node, depth, alpha, beta, maximizing_player):
 def reward(game):
     root = ConnectFourNode(game)
     result = minimax_alpha_beta(root, 3, -math.inf, math.inf, True)
+    print(result)
     return result
