@@ -11,6 +11,7 @@ COLS = 6
 ASSUMPTION: player_num is 2 for computer
 '''
 
+# TODO: Pruning
 
 def execute_minimax(board, player_num, depth):
     # do return with heuristic if depth is 0
@@ -30,11 +31,13 @@ def execute_minimax(board, player_num, depth):
         if row_to_check < 7:
             board_copy = copy.copy(board)
             board_copy[row_to_check][col] = player_num
-            move_utility = execute_minimax(board_copy, flip_player_num(player_num), depth-1)
+            move_utility = execute_minimax(board_copy, flip_player_num(player_num), depth - 1)
             utilities.append(move_utility)
-    # find either the minimum or maximum of utilities
-
-
+    # find either the minimum or maximum of utilities; player 1 minimizes, player 2 maximizes
+    if player_num == 1:
+        return min(utilities), utilities.index(min(utilities))
+    else:
+        return max(utilities), utilities.index(max(utilities))
 
 
 def flip_player_num(player_num):
