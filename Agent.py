@@ -174,7 +174,7 @@ def minimax_alpha_beta(node, depth, alpha, beta, maximizing_player):
         return min_eval
 
 def reward(game, curr_player):
-    depth = 2
+    depth = 3
     root = ConnectFourNode(game, curr_player)
     result = minimax_alpha_beta(root, 2 * depth, -math.inf, math.inf, curr_player == 2)
     print(result)
