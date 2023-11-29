@@ -128,7 +128,7 @@ class Connect4GUI:
         self.root.destroy()
 
 def selectMove(game):
-    max_reward = -1000
+    max_reward = -math.inf if game.current_player == 1 else math.inf
     move = -1
     for col in range(game.cols):
         if game.is_valid_move(col):
@@ -137,8 +137,12 @@ def selectMove(game):
             tempgame.board = [row[:] for row in copy]
             tempgame.current_player = game.current_player
             tempgame.make_move(col)
-            reward = agent.reward(tempgame.board)
-            if reward > max_reward:
+            reward = agent.reward(tempgame.board, tempgame.current_player)
+            
+            if game.current_player == 1 and reward > max_reward:
+                max_reward = reward
+                move = col
+            elif game.current_player == 2 and reward < max_reward:
                 max_reward = reward
                 move = col
     if move == -1:

@@ -19,7 +19,7 @@ class ConnectFourNode:
                 children.append(ConnectFourNode(child_board, pt=(3 - self.player_turn))) # Make child and switch turn
         return children
 
-    def heuristic(self, board, player=1):
+    def heuristic(self, board, player):
         h = 0
 
         for row in range(6):
@@ -30,7 +30,6 @@ class ConnectFourNode:
                     h_against += 1 if board[row][col + i] == (3 - player) else 0
                 h += h_for if all(board[row][col + i] != (3 - player) for i in range(4)) else 0
                 h -= h_against if all(board[row][col + i] != player for i in range(4)) else 0
-                print(h)
 
         for row in range(3):
             for col in range(7):
@@ -112,7 +111,7 @@ class ConnectFourNode:
     ## THIS IS THE REWARD FUNCTION
     ## IF YOU WANT TO TEST A HEURISTIC, CHANGE THIS FUNCTION TO RETURN YOUR REWARD VAlUE
     def evaluate_player(self, player):
-        return self.heuristic(self.board, player=player)
+        return self.heuristic(self.board, player)
         """ score = 0
         for row in range(6):
             for col in range(7):
@@ -169,8 +168,8 @@ def minimax_alpha_beta(node, depth, alpha, beta, maximizing_player):
                 break  # Alpha cutoff
         return min_eval
 
-def reward(game):
-    root = ConnectFourNode(game)
-    result = minimax_alpha_beta(root, 3, -math.inf, math.inf, True)
+def reward(game, next_player):
+    root = ConnectFourNode(game, next_player)
+    result = minimax_alpha_beta(root, 3, -math.inf, math.inf, next_player == 2)
     print(result)
     return result
