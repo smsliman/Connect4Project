@@ -130,6 +130,7 @@ class Connect4GUI:
 def selectMove(game):
     max_reward = -math.inf if game.current_player == 1 else math.inf
     move = -1
+    print(f"Player {game.current_player} is making a move...")
     for col in range(game.cols):
         if game.is_valid_move(col):
             tempgame = Connect4Game()
