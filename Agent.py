@@ -15,16 +15,18 @@ class ConnectFourNode:
             if self.is_valid_move(col):
                 #child_board = [row[:] for row in self.board]
                 child_board = copy.deepcopy(self.board)
-                self.make_move(child_board, col)
-                children.append(ConnectFourNode(child_board, pt=(3 - self.player_turn))) # Make child and switch turn
+                child = ConnectFourNode(child_board, pt=(3 - self.player_turn))
+                child.make_move(child.board, col)
+                children.append(child) # Make child and switch turn
         return children
 
     def heuristic(self, board, player, multiplier=7):
         
         if self.is_winner(player, board): 
             return 1000000
-        if self.is_winner(3 - player, board): 
-            return -1000000
+        for child in self.generate_children():
+            if child.is_winner(3 - player, board): 
+                return -1000000
 
         h = 0
 
@@ -32,8 +34,8 @@ class ConnectFourNode:
             for col in range(4):
                 h_for, h_against = 1, 1
                 for i in range(4):
-                    h_for *= multiplier if board[row][col + i] == player else 1
-                    h_against *= multiplier if board[row][col + i] == (3 - player) else 1
+                    h_for *= (2 * multiplier if self.player_turn == (3 - player) else multiplier) if board[row][col + i] == player else (0.5 if board[row][col + i] == 0 else 0)
+                    h_against *= (2 * multiplier if self.player_turn == player else multiplier) if board[row][col + i] == (3 - player) else (0.5 if board[row][col + i] == 0 else 0)
                 h += h_for if all(board[row][col + i] != (3 - player) for i in range(4)) else 0
                 h -= h_against if all(board[row][col + i] != player for i in range(4)) else 0
 
@@ -41,8 +43,8 @@ class ConnectFourNode:
             for col in range(7):
                 h_for, h_against = 1, 1
                 for i in range(4):
-                    h_for *= multiplier if board[row + i][col] == player else 1
-                    h_against *= multiplier if board[row + i][col] == (3 - player) else 1
+                    h_for *= (2 * multiplier if self.player_turn == (3 - player) else multiplier) if board[row + i][col] == player else (0.5 if board[row+ i][col] == 0 else 0)
+                    h_against *= (2 * multiplier if self.player_turn == player else multiplier) if board[row + i][col] == (3 - player) else (0.5 if board[row + i][col] == 0 else 0)
                 h += h_for if all(board[row + i][col] != (3 - player) for i in range(4)) else 0
                 h -= h_against if all(board[row + i][col] != player for i in range(4)) else 0
 
@@ -50,15 +52,15 @@ class ConnectFourNode:
             for col in range(4):
                 h_for, h_against = 1, 1
                 for i in range(4):
-                    h_for *= multiplier if board[row + i][col + i] == player else 1
-                    h_against *= multiplier if board[row + i][col + i] == (3 - player) else 1
+                    h_for *= (2 * multiplier if self.player_turn == (3 - player) else multiplier) if board[row + i][col + i] == player else (0.5 if board[row+ i][col + i] == 0 else 0)
+                    h_against *= (2 * multiplier if self.player_turn == player else multiplier) if board[row + i][col + i] == (3 - player) else (0.5 if board[row+ i][col + i] == 0 else 0)
                 h += h_for if all(board[row + i][col + i] != (3 - player) for i in range(4)) else 0
                 h -= h_against if all(board[row + i][col + i] != player for i in range(4)) else 0
 
                 h_for, h_against = 1, 1
                 for i in range(4):
-                    h_for *= multiplier if board[row + i][col + 3 - i] == player else 1
-                    h_against *= multiplier if board[row + i][col + 3 - i] == (3 - player) else 1
+                    h_for *= (2 * multiplier if self.player_turn == (3 - player) else multiplier) if board[row + i][col + 3 - i] == player else (0.5 if board[row+ i][col + 3 - i] == 0 else 0)
+                    h_against *= (2 * multiplier if self.player_turn == player else multiplier) if board[row + i][col + 3 - i] == (3 - player) else (0.5 if board[row+ i][col + 3 - i] == 0 else 0)
                 h += h_for if all(board[row + i][col + 3 - i] != (3 - player) for i in range(4)) else 0
                 h -= h_against if all(board[row + i][col + 3 - i] != player for i in range(4)) else 0
         
@@ -174,7 +176,7 @@ def minimax_alpha_beta(node, depth, alpha, beta, maximizing_player):
         return min_eval
 
 def reward(game, curr_player):
-    depth = 3
+    depth = 2
     root = ConnectFourNode(game, curr_player)
     result = minimax_alpha_beta(root, 2 * depth, -math.inf, math.inf, curr_player == 2)
     print(result)

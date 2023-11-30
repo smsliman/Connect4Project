@@ -15,7 +15,7 @@ class Connect4Game:
         self.cols = cols
         self.board = np.zeros((rows, cols), dtype=int)
         self.current_player = 1
-        self.mode = 'human'#'computer'
+        self.mode = 'computer'#'human'
 
     def is_valid_move(self, col):
         return self.board[0][col] == 0
